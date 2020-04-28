@@ -1,0 +1,5 @@
+postgres
+postgres/
+.vscode
+.metals
+__pycache__

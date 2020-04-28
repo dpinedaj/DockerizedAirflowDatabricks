@@ -1,0 +1,111 @@
+version: "3"
+services:
+  postgres:
+    user: root
+    image: "postgres:9.6"
+    container_name: "postgres"
+    environment:
+      - POSTGRES_USER=airflow
+      - POSTGRES_PASSWORD=airflow
+      - POSTGRES_DB=airflow
+    ports:
+      - "5432:5432"
+    #volumes:
+    #  - ./data/postgres:/var/lib/postgresql/data
+  # uncomment initdb if you need initdb at first run
+  initdb:
+    user: root
+    image: bricksbase
+    container_name: "initdb"
+    build: .
+    #TODO correctly implement 'wait-for-it.sh'
+    command: /bin/bash -c "sleep 5 && airflow initdb"
+    depends_on:
+      - postgres
+  webserver:
+    user: root
+    image: bricksbase
+    container_name: "webserver"
+    build: .
+    restart: always
+    depends_on:
+      - postgres
+    volumes:
+      - ./dags:/usr/local/airflow/dags
+      - ./src/modules:/usr/local/airflow/modules
+      - ./src/libraries:/usr/local/airflow/libraries
+    ports:
+      - "8080:8080"
+    command: /bin/bash -c "sleep 10 && airflow webserver"
+    healthcheck:
+      test: ["CMD-SHELL", "[ -f /usr/local/airflow/airflow-webserver.pid ]"]
+      interval: 30s
+      timeout: 30s
+      retries: 3
+  scheduler:
+    user: root
+    image: bricksbase
+    container_name: "scheduler"
+    build: .
+    restart: always
+    depends_on:
+      - postgres
+      - webserver
+    volumes:
+      - ./dags:/usr/local/airflow/dags
+      - ./src/modules:/usr/local/airflow/modules
+      - ./src/libraries:/usr/local/airflow/libraries
+    command: /bin/bash -c "sleep 10 && airflow scheduler"
+    healthcheck:
+      test: ["CMD-SHELL", "[ -f /usr/local/airflow/airflow-scheduler.pid ]"]
+      interval: 30s
+      timeout: 30s
+      retries: 3
+  redis:
+    image: redis:5.0.5
+    user: root
+    container_name: 'redis'
+    depends_on:
+      - postgres
+  worker:
+    build: .
+    image: bricksbase
+    user: root
+    container_name: 'worker'
+    restart: always
+    volumes:
+      - ./dags:/usr/local/airflow/dags
+      - ./src/modules:/usr/local/airflow/modules
+      - ./src/libraries:/usr/local/airflow/libraries
+    depends_on:
+      - postgres
+      - redis
+      - scheduler
+    command: /bin/bash -c "sleep 10 && airflow worker"
+    healthcheck:
+      test: ["CMD-SHELL", "[ -f /usr/local/airflow/airflow-worker.pid ]"]
+      interval: 30s
+      timeout: 30s
+      retries: 3
+  flower:
+    build: .
+    image: bricksbase
+    user: root
+    container_name: 'flower'
+    restart: always
+    volumes:
+      - ./dags:/usr/local/airflow/dags
+      - ./src/modules:/usr/local/airflow/modules
+      - ./src/libraries:/usr/local/airflow/libraries
+    depends_on:
+      - postgres
+      - redis
+      - scheduler
+    command: /bin/bash -c "sleep 10 && airflow flower"
+    healthcheck:
+      test: ["CMD-SHELL", "[ -f /usr/local/airflow/airflow-flower.pid ]"]
+      interval: 30s
+      timeout: 30s
+      retries: 3
+    ports:
+      - "5556:5555"
