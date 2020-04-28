@@ -34,7 +34,7 @@ RUN mkdir -p /usr/local/airflow/modules
 COPY ./src/airflow/airflow.cfg /usr/local/airflow/airflow.cfg
 COPY ./src/airflow/init.sh /usr/local/airflow/init.sh
 COPY ./src/airflow/userPrompt.py /usr/local/airflow/userPrompt.py
-COPY ./src/Airflow/packages.pth /usr/lib/python3.6/site-packages
+COPY ./src/airflow/packages.pth /usr/lib/python3.6/site-packages
 
 WORKDIR /usr/local/airflow/
 
