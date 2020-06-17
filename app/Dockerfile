@@ -23,10 +23,10 @@ RUN pip install psycopg2-binary \
     && pip install flask-bcrypt
 
 # Make necessary folders for volumes
-RUN mkdir -p /usr/local/airflow/dags
-RUN mkdir -p /usr/local/airflow/logs
-RUN mkdir -p /usr/local/airflow/libraries
-RUN mkdir -p /usr/local/airflow/modules
+RUN mkdir -p /usr/local/airflow/dags \
+    && mkdir -p /usr/local/airflow/logs \
+    && mkdir -p /usr/local/airflow/libraries \
+    && mkdir -p /usr/local/airflow/modules
 
 
 
