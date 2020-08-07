@@ -7,7 +7,7 @@ ENV C_FORCE_ROOT="true"
 
 # Update system and install necessary packages
 RUN yum update -y \
-    && yum install -y https://centos7.iuscommunity.org/ius-release.rpm \
+    && yum install -y https://repo.ius.io/ius-release-el7.rpm \
     && yum install -y python36u python36u-libs python36u-devel python36u-pip \
     && yum install -y which gcc \ 
     && yum install -y openldap-devel \
