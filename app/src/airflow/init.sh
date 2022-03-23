@@ -4,7 +4,7 @@ read token
 echo "Write host:"
 read host
 airflow connections --add \
-    --conn_id databricks_quipux \
+    --conn_id databricks_id \
     --conn_type databricks \
     --conn_login token \
     --conn_extra '{"token": "'"$token"'" , "host": "'"$host"'"}'
